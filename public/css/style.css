@@ -1,0 +1,109 @@
+body{
+    font-family: "Plus Jakarta Sans", sans-serif !important;
+    /* btn color in new form  */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}/* btn color in new form  */
+.container{
+    flex:1;
+    /* btn color in new form  */
+}
+.navbar-expand-md{
+    background-color: white;
+    height: 5rem;
+}
+.solids{
+    color: #fe424d !important;
+    background-color: white;
+    opacity: 1;
+    font-size: larger;
+}
+.nav-link{
+    color: #222222 !important;
+    opacity: 0.7;
+    transition:opacity 0.6s linear ,font-weight 0.6s linear !important;
+    transition: text-decoration-line 6s linear !important;
+}
+.nav-link:hover{
+    opacity: 1;
+    font-weight: 450;
+    text-decoration-line: overline underline;
+    text-decoration-thickness: 3px;
+    text-decoration-color: aqua;
+    text-decoration-style: dotted;
+}
+.f-clsss-links a{
+    text-decoration: none;
+    color: #222;
+}
+.f-clsss-links a:hover{
+    text-decoration: underline;
+    color: dodgerblue;
+}
+.f-clsss-socilac,.f-clsss-links,.f-clsss-company{
+    width:100%;
+    display:flex;
+    align-items: center;
+    justify-content:center;
+}
+.f-clsss-socilac {
+    font-size:1.5rem;
+}
+.f-clsss-socilac i{
+    margin-right: 1rem;
+}
+.f-clsss-whole{
+    text-align:center;
+    background-color: #bebebe;
+    height:5rem;
+    display:flex;
+    flex-wrap: wrap;
+    justify-content: center;    
+    align-items: space-evenly;
+}
+/* cards-list */
+.card-img-top{
+    height: 20rem;
+    margin-right: 2rem;
+}
+.card-list{
+    border:none !important;
+    margin-bottom: 2rem;
+}
+.card-img-top{
+    border-radius: 2rem !important;
+    width:100% !important;
+    object-fit: cover;
+}
+.card-body{
+    padding: 0 !important;
+}
+.card-text{
+    font-weight: 400;
+}
+.listing-anch{
+    text-decoration: none;
+}
+.card-img-overlay{
+    opacity: 1;
+}
+.card-img-overlay:hover{
+    opacity: 0.1;
+    background-color: white;
+}
+/* btn color in new form  */
+.add-btn{
+    background-color: #fe424d !important;
+    border:none !important;
+}
+.show-Photo{
+    height: 30vh;
+}
+.colbtn{
+    display: flex;
+    
+}
+.accordion-item{
+    border-radius: 20px !important;
+}

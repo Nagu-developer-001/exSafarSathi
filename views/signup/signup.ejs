@@ -1,0 +1,23 @@
+<%- layout("/layout/boilerplate") %>
+<body>
+    <div class="row mt-3">
+        <div class="col-6 offset-3">
+            <strong style="color: darkgreen;"><h2><strong>Sign-Up for SafarSathi</strong></h2></strong>
+            <form action="http://localhost:8080/signup" method="post" class="needs-validation" novalidate autocomplete="off">
+                <div class="mb-2">
+                    <label for="email" class="form-label">Email : </label>
+                    <input type="email" id="email" name="email" required class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label for="username" class="form-label">username : </label>
+                    <input type="username" id="username" name="username" required class="form-control">
+                </div>
+                <div class="mb-2">
+                    <label for="password" class="form-label">password : </label>
+                    <input type="password" id="password" name="password" required class="form-control">
+                </div>
+                <button class="btn btn-outline-success">Submit</button>
+            </form>
+        </div>
+    </div>
+</body>    

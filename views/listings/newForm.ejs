@@ -1,0 +1,64 @@
+<%- layout("/layout/boilerplate") %>
+<body>
+    <h3>Create New Listing</h3><br>
+    <div class="row">
+        <div class="col-8 offset-2">
+            <form action="http://localhost:8080/listings" method="post" class="needs-validation" novalidate autocomplete="off">
+                <div class="mb-3"><label for="title" class="form-label">Title : </label>
+                    <input type="text" placeholder="Enter title" name="Listing[title]" required class="form-control">
+                    <div class="valid-feedback">
+                        ok! setteled with a better name
+                    </div></div>
+                <div class="mb-3"><label for="description" class="form-label">Description : </label><br>
+                    <textarea placeholder="Enter Description" name="Listing[description]" required rows="4" cols="30" class="form-control"></textarea>
+                    <div class="valid-feedback">
+                        Great Description
+                    </div>
+                    <div class="invalid-feedback">
+                        Description up there!!!
+                    </div></div>
+                <div class="mb-3">
+                    <label for="image" class="form-label">Image : </label>
+                <input type="text" src="" alt="" name="Listing[image][url]" placeholder="Enter URL"  class="form-control" required>
+                <div class="invalid-feedback">
+                    send a url!!
+                </div>    
+            </div>
+                <div class="row">
+                    <div class="mb-3 col-sm-6">
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price : </label>
+                        <input type="text" placeholder="Enter Price" name="Listing[price]" class="form-control" required>
+                        <div class="valid-feedback">
+                            Good Price!!!
+                        </div>
+                        <div class="invalid-feedback">
+                            Enter a valid price!!
+                        </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 col-sm-6">
+                        <div class="mb-3"><label for="country" class="form-label">Country : </label>
+                            <input type="text" placeholder="Enter Country" name="Listing[country]" class="form-control" required>
+                            <div class="valid-feedback">
+                                Country name is Detected!!
+                            </div>
+                            <div class="invalid-feedback">
+                                Should enter a valid country name!!
+                            </div></div>
+                    </div>
+                    </div>
+                <div class="mb-3"><label for="location" class="form-label">Location : </label>
+                    <input type="text" placeholder="Enter Location" name="Listing[location]" class="form-control" required>
+                    <div class="valid-feedback">
+                        oK!!
+                    </div>
+                    <div class="invalid-feedback">
+                        Enter a valid Location name!!!!
+                    </div>
+                </div>
+                <button class="btn btn-dark add-btn">Submit</button><!--SENDED DATA IN BULK SOMEHOW IN ARRAY FORMAT-->
+            </form>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,33 @@
+<%- layout("/layout/boilerplate") %>
+<body>
+    <div class="row mt-3">
+        <div class="col-6 offset-3">
+            <div class="alert alert-success" role="alert">
+                <strong>Enter the credentials!!</strong>
+            </div>
+            <form action="http://localhost:8080/forgotPassword" method="post" class="needs-validation" novalidate autocomplete="off">
+                <div class="mb-2">
+                    <label for="Re-email" class="form-label">Email : </label>
+                    <input type="email" id="Re-email" name="Re_email" required class="form-control" placeholder="Enter email">
+                </div>
+                <div class="mb-2">
+                    <label for="password" class="form-label">password : </label>
+                    <input type="password" id="password" name="password" required class="form-control">
+                    <div class="invalid-feedback">
+                        Password must match
+                    </div>
+                </div>
+                
+                <div class="mb-2">
+                    <label for="Cpassword" class="form-label">Confirm password : </label>
+                    <input type="password" id="Cpassword" name="Cpassword" required class="form-control">
+                    <div class="invalid-feedback">
+                        Password must match 
+                    </div>
+                </div>
+                
+                <button class="btn btn-outline-success">Re-set</button>
+            </form>
+        </div>
+    </div>
+</body>
