@@ -1,22 +1,55 @@
+<style>
+    .search-btn{
+        background-color: #fe424d;
+        color:#fff;
+        border-radius: 25px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .search-inp{
+        padding: 0 100px 0 100px;
+        border-radius: 25px;
+        line-height: 1.5;
+    }
+    .search-btn:hover{
+        background-color: #fe424d;
+        color:#fff;
+    }
+    .search-btn i{
+        margin-right: 10px;
+    }
+    .mode input {
+    display: none;
+}
+</style>
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
     <div class="container-fluid">
-    <a class="navbar-brand" href="/"><i class="fa-solid fa-location-arrow solids"></i></a>
+    <a class="navbar-brand" href="/listings"><i class="fa-solid fa-location-arrow solids"></i></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-        <a class="nav-link " href="/">Home</a>
-        <a class="nav-link" href="/listings">All Listings</a>
-        <a class="nav-link" href="/listings/new">Add New Listing</a>
+        <a class="nav-link" href="/listings">Explore</a>
         </div>
         <div class="navbar-nav ms-auto">
+            <form class="d-flex" action="/search" method="get">
+                <input class="form-control me-3 search-inp" type="search" placeholder="Search Destinations" name="searchQuery">
+                <button class="btn search-btn" type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Search </button>
+            </form>
+        
+        </div>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/listings/new">Add New Listing</a>
             <%if(!nowUser){%>
             <a class="nav-link " href="SignUp">Sign-Up</a>
             <a class="nav-link" href="/login">Login</a>
             <%}%>
             <% if(nowUser) {%>
-            <a class="nav-link" href="/logout">Logout</a>
+                <a class="nav-link" href="/userDetails/<%= nowUser.id %>"><i class="fas fa-user"></i></a>
+                <a class="nav-link" href="/logout">Logout</a>
             <% } %>
             </div>
     </div>

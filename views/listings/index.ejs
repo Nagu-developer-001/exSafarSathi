@@ -1,7 +1,80 @@
 <%- layout("/layout/boilerplate") %>
+<style>
+.hero-title {
+  color: linear-gradient(270deg, #A0E9FF, #C2D9FF);
+  animation: gradientMove 10s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% {color:#FF8AAE}
+  25% {color:#FFB26B}
+  50% {color:#A0E9FF}
+  75% {color:#C2D9FF}
+  100%{color: #8377D1}
+}
+.card-body i{
+        display:none;
+    }
+    .price-tag{
+        display:none;
+    }
+</style>
 <%-  %>
 <body>
-    <h3>All Listing</h3>
+    <br>
+    <br>
+    <h2 class="hero-title">Go Where Your Heart Belongs!!!</h2>
+    <hr><hr>
+    <div id="filters">
+        <a href="/listings/list/Trending" class="filter">
+            <i class="fa-solid fa-fire"></i>
+            <p>Trending</p>
+        </a>
+        <a href="/listings/list/rooms" class="filter">
+            <i class="fa-solid fa-bed"></i>
+            <p>Rooms</p>
+        </a>
+        <a href="/listings/list/Iconiccities" class="filter">
+            <i class="fa-solid fa-city"></i>
+            <p>cities</p>
+        </a>
+        <a href="/listings/list/Mountains" class="filter">
+            <i class="fa-solid fa-mountain"></i>
+            <p>Mountains</p>
+        </a>
+        <a href="/listings/list/Castles" class="filter">
+            <i class="fa-brands fa-fort-awesome"></i>
+            <p>Castles</p>
+        </a>
+        <a href="/listings/list/Religion" class="filter">
+            <i class="fa-solid fa-om"></i>
+            <p>Religion</p>
+        </a>
+        <a href="/listings/list/Camping" class="filter">
+            <i class="fa-solid fa-tent-arrow-down-to-line"></i>
+            <p>Camping</p>
+        </a>
+        <a href="/listings/list/Farms" class="filter">
+            <i class="fa-solid fa-tractor"></i>
+            <p>Farms</p>
+        </a>
+        <a href="/listings/list/Arctic" class="filter">
+            <i class="fa-solid fa-snowman"></i>
+            <p>Arctic</p>
+        </a>
+		<a href="/listings/list/Waterfall" class="filter">
+            <i class="fa-solid fa-water-ladder"></i>
+            <p>Waterfall</p>
+        </a>
+		
+        
+        <div class="tax-toggle" style="border:1px solid black;width:200px ;border-radius: 1.5rem;">
+            <div class="form-check-reverse form-switch">
+                <label class="form-check-label" for="flexSwitchCheckDefault" style="padding-left:5px"> Tax</label>
+                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+            </div>
+        </div>
+    </div>
     <!-- <form action="listing/new" method="get">
         <button>new</button>
     </form> -->
@@ -12,11 +85,53 @@
                     <img src="<%=list.image.url%>" class="card-img-top" alt="...">
                     <div class="card-img-overlay"></div>
                     <div class="card-body">
-                    <p class="card-text"><b><%= list.title %></b><br>
-                        Price :&#8377;<%= list.price.toLocaleString("en-IN") %></p>
-                    </div>
+                        <p class="card-text card-texting"><b><%= list.title %></b><br>
+                            Price :&#8377;<b class="price-tags"><%= list.price.toLocaleString("en-IN") %></b>
+                            <b class="price-tag"><%= list.price.toLocaleString("en-IN") %></b>
+                        </p>
+                            &nbsp;&nbsp;&nbsp;<i class="taxation">+18% GST</i>
+                        </div>
                 </div>
             </a>
             <%}%>
     </div>
 </body>
+<script>
+    let priceTag = document.querySelectorAll(".card-text .price-tags");
+    let priceSpan = document.querySelectorAll(".card-text .price-tag");
+    let tax = document.querySelectorAll(".taxation");
+    let toggle = document.querySelector("#flexSwitchCheckDefault");
+    toggle.addEventListener("change",(e)=>{
+        for(info of tax){
+            if(info.style.display != "inline"){
+            info.style.display = "inline";
+            }
+        else{
+            info.style.display = "none";
+        }}
+        for(let i=0;i<priceTag.length;i++){
+            let p = priceTag[i].innerText.replace(/,/g, '');
+            let GST = Math.floor((p*18)/100);
+            let TotalTax = Number(p)+GST;
+            const indianNumberFormat = new Intl.NumberFormat('en-IN', {
+                                                                        maximumSignificantDigits: 3}); 
+            let INDNum = indianNumberFormat.format(TotalTax);
+            priceSpan[i].innerText = INDNum;
+        }
+        if(toggle.checked){
+            for(price of priceTag){
+                price.style.display = "none"
+            }
+            for(price of priceSpan){
+                price.style.display = "inline"
+            }
+        }else{
+            for(price of priceTag){
+                price.style.display = "inline"
+            }
+            for(price of priceSpan){
+                price.style.display = "none"
+            }
+        }
+    });
+</script>

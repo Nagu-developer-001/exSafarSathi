@@ -7,6 +7,12 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const ExpressErr = require("../utils/ExpressErr.js");
 const passport = require("passport");
 
+
+const multer  = require('multer');
+const {storage} = require("../cloudConfigure.js");
+const upload = multer({ storage: storage });
+
+
 const {isLogined,listOwner,UniqueUrl} = require("../AuthenticLogin.js");
 const {validateData} =require("../AuthenticLogin.js");
 
@@ -40,13 +46,28 @@ router.get("/new",isLogined,wrapAsync((req,res)=>{
         res.render("listings/newForm.ejs");
 }));
 
-// const log = (req,res,next)=>{
-//     if(!req.isAuthenticated()){
-//         req.flash("error","If you want to add review Please log-in to our System!!!");
-//         return next();
-//     }
-//     next();
-// }
+router.get('/list/:category', async(req, res) => {
+    const categori = req.params.category;
+    req.session.catFiler = categori;
+    let categories = {
+        Trending:"Trending",
+        rooms:"rooms",
+        Iconiccities:"Iconiccities",
+        Mountains:"Mountains",
+        Castles:"Castles",
+        Religion:"Religion",
+        Camping:"Camping",
+        Farms:"Farms",
+        Arctic:"Arctic",
+        Waterfall:"Waterfall"
+    };
+    if(categories[categori]){
+        allListing = await placeList.find({category:categori});
+        res.render("listings/index.ejs",{allListing});
+    }else{
+        console.log("no data found");
+    }
+});
 //TODO SHOW ROUTE
 router.get("/:id",UniqueUrl,wrapAsync(async(req,res,next)=>{
     let {id} = req.params;

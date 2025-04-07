@@ -9,11 +9,12 @@
                 <div class="card-body">
                 <p class="card-text"><b><%=content.title%></b></p>
                 <p class="card-text">Owned by  <b><%= content.owner.username %></b></p>
-                <p class="card-text"><b><%= content.description %></b></p><br>
-                <p class="card-text"><b>&#8377;<%= content.price.toLocaleString("en-IN") %></b></p><br>
-                <p class="card-text"><b><%= content.location %></b></p><br>
-                <p class="card-text"><b><%= content.country %></b></p><br>
+                <p class="card-text"><b><%= content.description %></b></p>
+                <p class="card-text"><b>&#8377;<%= content.price.toLocaleString("en-IN") %></b></p>
+                <p class="card-text"><b><%= content.location %></b></p>
+                <p class="card-text"><b><%= content.country %></b></p>
                 </div>
+                <a href="booking"><button  class="btn btn-warning">Book Now</button></a>
             </div>
     <%if(nowUser && nowUser._id.equals(content.owner._id)){%>
             <div class="colbtn">
@@ -23,11 +24,13 @@
             </form>
         </div>
     <% } %>
+    <% if (!nowUser) { %>
     <div class="col-8 offset-2 mb-3 mt-4">
       <div class="alert alert-success" role="alert">
         <strong style="justify-content: center;">If you want to addd review Kindly log-in to our System</strong>
     </div>
     </div>
+    <% } %>
     <% if (nowUser) { %>
         <div class="col-8 offset-2 mb-3">
           <hr>
@@ -36,7 +39,7 @@
             <form action="/listings/<%= content._id %>/reviews" method="POST" novalidate class="needs-validation">
               <div class="mb-3 mt-3">
                 <label for="rating" class="form-label">Rating</label>
-                <fieldset class="starability-coinFlip">
+                <fieldset class="starability-slot">
                   <input type="radio" id="no-rate" class="input-no-rate" name="reviews[rating]" value="1" checked aria-label="No rating." />
                   <input type="radio" id="first-rate1" name="reviews[rating]" value="1" />
                   <label for="first-rate1" title="Terrible">1 star</label>

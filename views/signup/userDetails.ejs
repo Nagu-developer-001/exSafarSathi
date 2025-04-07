@@ -1,0 +1,122 @@
+<%- layout("/layout/boilerplate") %>
+<body>
+    <div class="row mt-3">
+        <div class="col-6 offset-3">
+            <b><h2>Want to Update Your Profile? </h2></b>
+            
+            <form action="http://localhost:8080/updateUser/<%= user.id %>/edit" method="post" class="needs-validation" novalidate autocomplete="off" enctype="multipart/form-data">
+                <div class="profile-container text-center">
+                    <label for="imageInput" class="profile-label">
+                        <img id="profileImage" src="<%= user.image.url || 'https://static.vecteezy.com/system/resources/previews/026/619/142/original/default-avatar-profile-icon-of-social-media-user-photo-image-vector.jpg' %>" alt="Profile Image" class="rounded-circle profile-img">
+                        <div class="camera-icon">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                    </label>
+                    <input type="file" id="imageInput" name="userData[image]" class="form-control d-none" accept="image/*">
+                </div>
+
+                    <div class="mb-2">
+                        <label for="username" class="form-label">Name :</label>
+                        <div class="input-container">
+                            <input type="text" id="username" name="userData[username]" required class="form-control" value="<%= user.username %>">
+                            <i class="fa-solid fa-pen-fancy icon" id="penIcn"></i>
+                        </div>
+                    </div>
+    
+                    <!-- Email Field -->
+                    <div class="mb-2">
+                        <label for="phone" class="form-label">Phone Number:</label>
+                        <div class="input-container">
+                            <input type="text" id="phone" name="userData[phone]" title="This may help in future!" maxlength="10" value="<%= user.phone%>" class="form-control">
+                            <i class="fa-solid fa-pen-fancy icon" id="penIcn1"></i>
+                            <small id="phoneHint" class="form-text text-muted hint-box" style="display: none;">This may help in future!</small>
+                        </div>
+                    </div>
+                <input type="submit" value="Update" class="btn btn-success">
+                </form>
+                
+                <!-- Name Field -->
+                
+        </div>
+    </div>
+    <script>
+        const phoneInput = document.getElementById('phone');
+        const phoneHint = document.getElementById('phoneHint');
+        const icon = document.getElementById('penIcn');
+        const icon1 = document.getElementById('penIcn1');
+        const username = document.getElementById('username');
+        username.addEventListener('focus',()=>{
+            icon.style.display = 'none';
+        });
+        username.addEventListener('blur',()=>{
+            icon.style.display = 'block';
+        });
+        phoneInput.addEventListener('focus', () => {
+            phoneHint.style.display = 'block';
+            icon1.style.display = 'none';
+
+        });
+
+        phoneInput.addEventListener('blur', () => {
+            phoneHint.style.display = 'none';
+            icon1.style.display = 'block';
+        });
+    </script>
+    <style>
+        .hint-box {
+        background-color: yellow;
+        padding: 5px 10px;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        color: black;
+        font-weight: bold;
+    }
+        .profile-container {
+            position: relative;
+            display: inline-block;
+        }
+        .profile-label {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+        }
+        .camera-icon {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: green;
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .camera-icon i {
+            font-size: 16px;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .input-container input {
+            padding-right: 35px; /* Space for the icon */
+        }
+
+        .input-container .icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d; /* Bootstrap text-muted color */
+        }
+
+    </style>
+</body>
