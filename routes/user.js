@@ -158,7 +158,7 @@ router.post("/forgotPasswordOtp",async(req,res)=>{
     if(!listingUser){
         req.flash("error","Account not found!!");
         console.log("ERROR-A/c not found");
-        return res.redirect("/");
+        return res.redirect("/forgotPassword");
     }
     if(password!=Cpassword){
         req.flash("error","write the both password correctly!");
