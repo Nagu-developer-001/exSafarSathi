@@ -18,18 +18,23 @@
     .search-btn i{
         margin-right: 10px;
     }
-    .mode input {
+    /* .mode input {
     display: none;
-}
+} */
 </style>
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
     <div class="container-fluid">
     <a class="navbar-brand" href="/listings"><i class="fa-solid fa-location-arrow solids"></i></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <label class="mode">
+            <input type="checkbox" id="darkModeToggle">
+            <i class="fa-solid fa-moon"></i>
+        </label>
         <div class="navbar-nav">
+        <!-- <a class="nav-link " href="/">Home</a> -->
         <a class="nav-link" href="/listings">Explore</a>
         </div>
         <div class="navbar-nav ms-auto">
@@ -44,14 +49,61 @@
         <div class="navbar-nav ms-auto">
             <a class="nav-link" href="/listings/new">Add New Listing</a>
             <%if(!nowUser){%>
-            <a class="nav-link " href="SignUp">Sign-Up</a>
-            <a class="nav-link" href="/login">Login</a>
+            <a class="nav-link " href="/signup"><b>Sign-Up</b></a>
+            <a class="nav-link" href="/login"><b>Login</b></a>
             <%}%>
             <% if(nowUser) {%>
                 <a class="nav-link" href="/userDetails/<%= nowUser.id %>"><i class="fas fa-user"></i></a>
-                <a class="nav-link" href="/logout">Logout</a>
+            <a class="nav-link" href="/logout"><b>Logout</b></a>
             <% } %>
+            
             </div>
     </div>
     </div>
 </nav>
+<script>
+    const darkModeToggle = document.getElementById('darkModeToggle');
+const header = document.getElementsByClassName('navbar')[0];
+const body = document.querySelector(".dark");
+const cards = document.querySelectorAll(".card");
+const solid = document.querySelector(".solids");
+//console.log(header,body,cards);
+const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+if (isDarkMode){
+    solid.classList.add('dark-solid');
+    header.classList.add('dark-mode');
+    body.classList.add('dark-mode');
+    addBack();
+    darkModeToggle.checked = true;
+}
+darkModeToggle.addEventListener('change', () => {
+    if (darkModeToggle.checked){
+        solid.classList.add('dark-solid');
+        header.classList.add('dark-mode');
+        body.classList.add('dark-mode');
+        addBack();
+        localStorage.setItem('darkMode', 'enabled');
+    }
+    else{
+        setTimeout(()=>{
+            solid.classList.remove('dark-solid');
+            header.classList.remove('dark-mode');
+        body.classList.remove('dark-mode');
+        removeBack();
+        localStorage.setItem('darkMode', 'disabled')
+        },500);
+        
+    }
+});
+
+function addBack(){
+    for(card of cards){
+        card.classList.add("card-dark");
+    }
+}
+function removeBack(){
+    for(card of cards){
+        card.classList.remove("card-dark");
+    }
+}
+</script>

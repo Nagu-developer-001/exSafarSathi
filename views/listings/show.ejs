@@ -14,7 +14,7 @@
                 <p class="card-text"><b><%= content.location %></b></p>
                 <p class="card-text"><b><%= content.country %></b></p>
                 </div>
-                <a href="booking"><button  class="btn btn-warning">Book Now</button></a>
+                <a href="http://localhost:8080/booking/<%= content._id %>"><button  class="btn btn-warning">Book Now</button></a>
             </div>
     <%if(nowUser && nowUser._id.equals(content.owner._id)){%>
             <div class="colbtn">
@@ -64,23 +64,25 @@
           </div>
         <% } %>
         
-          <div class="row">
-            <%if(content.reviews.length>0){%>
-                <p><b>All Reviews</b></p>
-            <%}%>
-            <% for (review of content.reviews) { %>
-            <div class="card ms-4 mt-2 mb-3" style="width: 18rem;">
-              <div class="card-body">
-                <h5 class="card-title">@<%=review.author.username %></h5>
-                <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
-                <p class="card-text"><%= review.comment %></p>
-              </div>
-              <form class="mb-3" method="POST" action="/listings/<%= content._id %>/reviews/<%= review._id %>?_method=DELETE">
-                <button class="btn btn-sm btn-dark">Delete</button>
-              </form>
+        <div class="row">
+          <%if(content.reviews.length>0){%>
+              <p><b>All Reviews</b></p>
+          <% for (review of content.reviews) { %>
+          <div class="card ms-4 mt-2 mb-3" style="width: 18rem;">
+            <div class="card-body">
+              <h5 class="card-title">@<%=review.author.username %></h5>
+              <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
+              <p class="card-text"><%= review.comment %></p>
             </div>
-            <% } %>
+            <% if(nowUser && review.author.id === nowUser.id){ %>
+            <form class="mb-3" method="POST" action="/listings/<%= content._id %>/reviews/<%= review._id %>?_method=DELETE">
+              <button class="btn btn-sm btn-dark">Delete</button>
+            </form>
+          <%}%> 
           </div>
+          <% } %>
+          <%}%>
+        </div>
         </div>
       </div>
       </body>

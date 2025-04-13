@@ -49,10 +49,11 @@ router.get("/new",isLogined,wrapAsync((req,res)=>{
 router.get('/list/:category', async(req, res) => {
     const categori = req.params.category;
     req.session.catFiler = categori;
+    //console.log(req.session.catFiler,categori);
     let categories = {
         Trending:"Trending",
         rooms:"rooms",
-        Iconiccities:"Iconiccities",
+        iconicCities:"Iconiccities",
         Mountains:"Mountains",
         Castles:"Castles",
         Religion:"Religion",
@@ -62,16 +63,19 @@ router.get('/list/:category', async(req, res) => {
         Waterfall:"Waterfall"
     };
     if(categories[categori]){
+        console.log(categories[categori],categori);
         allListing = await placeList.find({category:categori});
+        console.log(allListing," - Total - Listings");
         res.render("listings/index.ejs",{allListing});
     }else{
         console.log("no data found");
+        res.redirect("/listings");
     }
 });
 //TODO SHOW ROUTE
 router.get("/:id",UniqueUrl,wrapAsync(async(req,res,next)=>{
     let {id} = req.params;
-    let content = await placeList.findById(id).populate("reviews").populate("owner");
+    let content = await placeList.findById(id).populate({path:"reviews",populate:{path:"author"}}).populate("owner");
     if(!content){
         req.flash("error","Your searching for this content is not found");
         res.redirect("/listings");

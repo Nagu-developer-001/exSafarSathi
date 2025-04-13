@@ -118,6 +118,8 @@ function castError(err){
 }
 //TODO ERROR HANDILNG ROUTE
 //TODO PAGE NOT FOUND   USE BOOTSRAP ALERT COMPONENT
+
+
 app.all("*",(req,res,next)=>{
     console.log("err");
     next(new ExpressErr(404,"PAGE NOT FOUND!!"));

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const review = require("./review");
-
+const Booking = require("./booking");
 const Schema = mongoose.Schema;
 const placeSchema =  new Schema({
     title:{
@@ -24,7 +24,7 @@ const placeSchema =  new Schema({
     },
     category:{
         type:String,
-        enum:["Trending","rooms","Iconiccities","Mountains","Castles","Religion","Camping","Farms","Arctic","Waterfall"]
+        enum:["Trending","rooms","iconicCities","Mountains","Castles","Religion","Camping","Farms","Arctic","Waterfall"]
     },
     reviews:[
         {
@@ -40,6 +40,7 @@ const placeSchema =  new Schema({
 placeSchema.post("findOneAndDelete",async (Listing)=>{
     console.log(Listing,"POST MIDDLEWARE");
     let res = await review.deleteMany({_id:{$in:Listing.reviews}});
+    let res1 = await Booking.deleteMany({title:Listing.title});
 });
 const placeList = new mongoose.model("placeList",placeSchema);
 

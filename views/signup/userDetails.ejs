@@ -1,4 +1,9 @@
 <%- layout("/layout/boilerplate") %>
+<style>
+    .card-lists{
+        margin-left: 8px;
+    }
+</style>
 <body>
     <div class="row mt-3">
         <div class="col-6 offset-3">
@@ -34,7 +39,26 @@
                     </div>
                 <input type="submit" value="Update" class="btn btn-success">
                 </form>
-                
+                <br>
+                <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 ">
+                    
+                    <% for(booking of userBooking){ %>
+                        <!-- <%= //booking._id %> -->
+                        <a href="http://localhost:8080/listings/<%= booking.places_list._id%>" class="listing-link">
+                        <div class="card col card-lists mb-2">
+                            <div class="card-body">
+                                <p class="card-text" style="text-decoration: none !important;"><b>Listing: <%= booking.places_list.title %></b></p>
+                                <!-- <b></b><br> -->
+                                <p class="card-text">Located @<%= booking.places_list.location %></p>
+                                
+                                <form action="http://localhost:8080/del/<%= booking._id %>?_method=DELETE" method="post">
+                                    <button class="btn btn-dark add-btn">Cancel</button>
+                                </form>
+                            </div>
+                        </div>
+                        </a>
+                        <%}%>
+                </div>
                 <!-- Name Field -->
                 
         </div>
@@ -61,6 +85,11 @@
             phoneHint.style.display = 'none';
             icon1.style.display = 'block';
         });
+        document.querySelectorAll(".add-btn").forEach(button => {
+    button.addEventListener("click", (event) => {
+        event.stopPropagation(); // Prevents the anchor from triggering
+    });
+});
     </script>
     <style>
         .hint-box {

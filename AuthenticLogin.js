@@ -79,8 +79,20 @@ module.exports.Re_ValidateEmail = async(req,res,next)=>{
 
 
 
+    // let Re_email = req.session.Re_email;
+    //         const send = require('gmail-send')({
+    //                 user: 'trivikramagroupofltd@gmail.com',//TODO - Trivikrama!1,Bhat987654321!-MAPBOX
+    //                 pass: 'szinrtyyqykbyzxu',
+    //                 to:  Re_email,
+    //                 subject: 'No Replay Email.',
+    //             });
 
 
+    //             send({
+    //                 html:`<p>If you are agree with the updation of password!!?</p><br><h4>Please enter your OTP - ${re_otp}</h4>`,
+    //             }, async(error, result, fullResult) => {
+    //                 console.error(fullResult,error);
+    //                     });
 
 
 

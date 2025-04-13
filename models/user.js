@@ -18,6 +18,9 @@ const UserSchema = new Schema({
     phone:{
         type:String
     },
+    hasBooked: {
+        type: Boolean,
+        default: false }
 });
 
 UserSchema.plugin(passportLocalMongoose);

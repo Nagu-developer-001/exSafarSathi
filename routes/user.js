@@ -3,20 +3,35 @@ const router = express.Router({mergeParams:true});
 const mongoose = require("mongoose");
 const User = require("../models/user.js");
 const passport = require("passport");
+const Booking = require("../models/booking.js");
 const flash = require("connect-flash");
 const { saveUrl ,validateRegister,validateUpdateUser,Re_ValidateEmail} = require("../AuthenticLogin.js");
+const placeList = require("../models/wonderLust.js");
+const wrapAsync = require("../utils/wrapAsync.js");
 
 
 const multer  = require('multer');
 const {storage} = require("../cloudConfigure.js");
 const upload = multer({ storage: storage });
 
-router.get("/userDetails/:id",async(req,res)=>{
-    let {id} = req.params;
+router.get("/userDetails/:id",wrapAsync(async(req,res)=>{
+    if(!req.isAuthenticated()){
+        req.flash("error","You have to be logined");
+        res.redirect("/listings");
+    }else{
+        let {id} = req.params;
     let user = await User.findById(id);
-    res.render("./signup/userDetails.ejs",{user});
-});
-router.post("/updateUser/:id/edit",upload.single('userData[image]'),validateUpdateUser,async(req,res)=>{
+    let userBooking = await Booking.find({owner:id}).populate({path:"places_list",populate:{path:"owner"}});
+    //let placeBooking = await placeList.find();
+    console.log(userBooking);
+    res.render("./signup/userDetails.ejs",{user,userBooking});
+    }
+}));
+router.post("/updateUser/:id/edit",upload.single('userData[image]'),validateUpdateUser,wrapAsync(async(req,res)=>{
+    if(!req.isAuthenticated()){
+        req.flash("error","You have to be logined");
+        res.redirect("/listings");
+    }else{
     let id = req.params.id;
     console.log(id);
     let data = await User.findByIdAndUpdate(id,{...req.body.userData});
@@ -31,15 +46,16 @@ router.post("/updateUser/:id/edit",upload.single('userData[image]'),validateUpda
     req.flash("success","Your Personal Details Edited Successfully!");
     console.log(id);
     res.redirect(`/userDetails/${id}`);
-});
+}
+}));
 
 router.get("/forgotPasswordOtp");
-router.get("/signup", (req, res) => {
+router.get("/signup",wrapAsync( (req, res) => {
     console.log("reder file for sign up");
     res.render("./signup/signup.ejs");
-});
+}));
 
-router.post("/signup", validateRegister, async (req, res) => {
+router.post("/signup", validateRegister,wrapAsync( async (req, res) => {
     try {
         console.log("Signup request received:", req.body);
 
@@ -56,11 +72,11 @@ router.post("/signup", validateRegister, async (req, res) => {
         req.flash("error", "Something went wrong. Please try again.");
         res.redirect("/signup");
     }
-});
-router.get("/validateotp",(req,res)=>{
+}));
+router.get("/validateotp",wrapAsync((req,res)=>{
     res.render("./signup/otp.ejs");
-});
-router.post("/validateotp",async(req,res)=>{
+}));
+router.post("/validateotp",wrapAsync(async(req,res)=>{
         let email = req.session.email;
         let username = req.session.username;
         let password = req.session.password;
@@ -83,12 +99,12 @@ router.post("/validateotp",async(req,res)=>{
             req.flash("error","You Entered wrong OTP");
             res.redirect("/signup");
         }
-});
+}));
 
 
-router.get("/login", (req, res) => {
+router.get("/login",wrapAsync( (req, res) => {
     res.render("./signup/login.ejs");
-});
+}));
 
 router.post(
     "/login",
@@ -97,14 +113,14 @@ router.post(
         failureRedirect: "/login",
         failureFlash: true,
     }),
-    (req, res) => {
+    wrapAsync((req, res) => {
         const redirectUrl = res.locals.redirectUrl || res.locals.redirectUrlUnique || "listings";
         req.flash("success", "Welcome back to SafarSathi");
         return res.redirect(redirectUrl);
     }
-);
+));
 
-router.get("/logout", (req, res, next) => {
+router.get("/logout",(req, res, next) => {
     if (req.isAuthenticated()) {
         req.logout((err) => {
             if (err) {
@@ -118,9 +134,9 @@ router.get("/logout", (req, res, next) => {
         res.redirect("/login");
     }
 });
-router.get("/forgotPassword",(req,res)=>{
+router.get("/forgotPassword",wrapAsync((req,res)=>{
     res.render("./signup/forgotEmail.ejs");
-});
+}));
 
 
 
@@ -147,7 +163,7 @@ router.get("/forgotPassword",(req,res)=>{
 
 
 
-router.post("/forgotPasswordOtp",async(req,res)=>{
+router.post("/forgotPasswordOtp",wrapAsync(async(req,res)=>{
     let {Re_email,passwordName,password,Cpassword} = req.body;
     req.session.Re_email = Re_email;
     req.session.passwordName = passwordName;
@@ -165,16 +181,16 @@ router.post("/forgotPasswordOtp",async(req,res)=>{
         return res.redirect("/forgotPassword");
     }
     res.redirect("/validatePasswordOtp");
-});
-router.get("/validatePasswordOtp",Re_ValidateEmail,(req,res)=>{
+}));
+router.get("/validatePasswordOtp",Re_ValidateEmail,wrapAsync((req,res)=>{
     res.render("signup/passwordOtp.ejs");
-})
-router.post("/validatePasswordOtp",async(req,res)=>{
+}));
+router.post("/validatePasswordOtp",wrapAsync(async(req,res)=>{
     let Re_email = req.session.Re_email;
     let listingUser = await User.findOne({username:req.session.passwordName});
     await listingUser.setPassword(req.session.Cpassword);
     await listingUser.save();
     req.flash("success","Successfully Updated password!");
     res.redirect("/login");
-});
+}));
 module.exports = router;
