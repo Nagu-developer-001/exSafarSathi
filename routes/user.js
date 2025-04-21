@@ -127,7 +127,7 @@ router.post(
 router.get("/logout",(req, res, next) => {
     if (req.isAuthenticated()) {
         req.logout((err) => {
-            if () {
+            if (err) {
                 return next(err);
             }
             req.flash("success", "You logged out");
