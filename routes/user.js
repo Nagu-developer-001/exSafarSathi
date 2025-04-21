@@ -5,7 +5,7 @@ const User = require("../models/user.js");
 const passport = require("passport");
 const Booking = require("../models/booking.js");
 const flash = require("connect-flash");
-const { saveUrl ,validateRegister,validateUpdateUser,Re_ValidateEmail} = require("../AuthenticLogin.js");
+const { UniqueUrl,saveUrl ,validateRegister,validateUpdateUser,Re_ValidateEmail,showUrl} = require("../AuthenticLogin.js");
 const placeList = require("../models/wonderLust.js");
 const wrapAsync = require("../utils/wrapAsync.js");
 
@@ -107,14 +107,18 @@ router.get("/login",wrapAsync( (req, res) => {
 }));
 
 router.post(
-    "/login",
+    "/login",UniqueUrl,
     saveUrl,
     passport.authenticate("local", {
         failureRedirect: "/login",
         failureFlash: true,
     }),
     wrapAsync((req, res) => {
-        const redirectUrl = res.locals.redirectUrl || res.locals.redirectUrlUnique || "listings";
+        const redirectUrl = res.locals.redirectUrl || "listings" ;
+        if(req.session.showUrl){
+            redirectUrl = req.session.showUrl
+        }
+        
         req.flash("success", "Welcome back to SafarSathi");
         return res.redirect(redirectUrl);
     }
@@ -123,7 +127,7 @@ router.post(
 router.get("/logout",(req, res, next) => {
     if (req.isAuthenticated()) {
         req.logout((err) => {
-            if (err) {
+            if () {
                 return next(err);
             }
             req.flash("success", "You logged out");
@@ -182,9 +186,9 @@ router.post("/forgotPasswordOtp",wrapAsync(async(req,res)=>{
     }
     res.redirect("/validatePasswordOtp");
 }));
-router.get("/validatePasswordOtp",Re_ValidateEmail,wrapAsync((req,res)=>{
+router.get("/validatePasswordOtp",Re_ValidateEmail,(req,res)=>{
     res.render("signup/passwordOtp.ejs");
-}));
+});
 router.post("/validatePasswordOtp",wrapAsync(async(req,res)=>{
     let Re_email = req.session.Re_email;
     let listingUser = await User.findOne({username:req.session.passwordName});

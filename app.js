@@ -17,6 +17,7 @@ app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
 app.use(express.static(path.join(__dirname,"/public")));
 app.use(express.urlencoded({extended:true}));
+// app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverload("_method"));
 const ExpressErr = require("./utils/ExpressErr.js");
@@ -82,6 +83,8 @@ app.use("/",reviewsRouter);
 
 
 // const review = require("./models/review.js");
+const db_url = process.env.ATLASDB_URL;
+console.log(db_url);
 console.log(ExpressErr);
 main().then((res)=>{
     console.log("Successfully Connected to DataBase!");
@@ -91,7 +94,7 @@ main().then((res)=>{
 
 
 async function main(){
-    await mongoose.connect("mongodb://127.0.0.1:27017/wonderLust");
+    await mongoose.connect(db_url);
 }
 app.use("/api",(req,res,next)=>{
     console.log("This is middleware !!! for/here we do athentication");

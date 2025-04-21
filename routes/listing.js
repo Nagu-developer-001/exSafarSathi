@@ -10,11 +10,11 @@ const passport = require("passport");
 
 const multer  = require('multer');
 const {storage} = require("../cloudConfigure.js");
-const upload = multer({ storage: storage });
+const upload = multer({  storage });
 
 
-const {isLogined,listOwner,UniqueUrl} = require("../AuthenticLogin.js");
-const {validateData} =require("../AuthenticLogin.js");
+const {isLogined,listOwner,UniqueUrl,validateData, saveUrl,showUrl} = require("../AuthenticLogin.js");
+// const {} =require("../AuthenticLogin.js");
 
 
 //todo TESTING ROUTE
@@ -45,7 +45,35 @@ router.get("/new",isLogined,wrapAsync((req,res)=>{
         console.log(req.locals);
         res.render("listings/newForm.ejs");
 }));
+//TODO CREATE ROUTE
+router.post("/",isLogined,upload.single('Listing[image]'),validateData,async(req,res)=>{
+    // if(!req.body.Listing){
+    //     next( new ExpressErr(402,"INTERNAL SERVER ERROR"));
+    // }
+    
+        console.log("Headers:", req.headers);
+        console.log("Method:", req.method);
+        console.log("Body:", req.body);
+        let url = req.file.path;
+    let filename = req.file.filename;
+    console.log("hello");
+    let placeLists = req.body.Listing;
+    placeLists.owner = req.user._id;
+    placeLists.image = {url,filename}
+    console.log(placeLists);
+    let placeAdd = await placeList.insertMany(placeLists);
+    console.log(placeAdd);
+    req.flash("success","New Listing is Created!!!");
+    res.redirect("/listings");
+    // placeLists.owner = req.user._id;
+    // let placeAdd = await placeList.insertMany(placeLists);
 
+    // placeAdd.owner = req.user._id;
+    // await placeAdd.save();
+    // console.log(placeAdd);
+    // req.flash("success","New Listing is Created!!!");
+    // res.redirect("/listings");
+});
 router.get('/list/:category', async(req, res) => {
     const categori = req.params.category;
     req.session.catFiler = categori;
@@ -73,7 +101,7 @@ router.get('/list/:category', async(req, res) => {
     }
 });
 //TODO SHOW ROUTE
-router.get("/:id",UniqueUrl,wrapAsync(async(req,res,next)=>{
+router.get("/:id",showUrl,wrapAsync(async(req,res,next)=>{
     let {id} = req.params;
     let content = await placeList.findById(id).populate({path:"reviews",populate:{path:"author"}}).populate("owner");
     if(!content){
@@ -89,21 +117,9 @@ router.get("/:id",UniqueUrl,wrapAsync(async(req,res,next)=>{
     res.render("listings/show.ejs",{content});
 }));
 
-//TODO CREATE ROUTE
-router.post("/",isLogined,validateData,wrapAsync(async(req,res)=>{
-    // if(!req.body.Listing){
-    //     next( new ExpressErr(402,"INTERNAL SERVER ERROR"));
-    // }
-    console.log("hello");
-    let placeLists = req.body.Listing;
-    placeLists.owner = req.user._id;
-    let placeAdd = await placeList.insertMany(placeLists);
-    console.log(placeAdd);
-    req.flash("success","New Listing is Created!!!");
-    res.redirect("/listings");
-}));
+
 //TODO EDIT ROUTE
-router.get("/:id/edit",isLogined,listOwner,wrapAsync(async(req,res)=>{
+router.get("/:id/edit",isLogined,saveUrl,listOwner,wrapAsync(async(req,res)=>{
     let {id} = req.params;
     console.log("Listing id :--",id);
     console.log("Listing id :--",id);
@@ -114,14 +130,18 @@ router.get("/:id/edit",isLogined,listOwner,wrapAsync(async(req,res)=>{
     if(!content){
         req.flash("error","This list is not exist!!");
         res.redirect("/listings");
+    }else{
+        res.render("listings/edit.ejs",{content});
     }
 }));
 //TODO UPDATE ROUTE
-router.put("/:id",isLogined,listOwner,validateData,wrapAsync(async(req,res)=>{
+router.put("/:id",isLogined,UniqueUrl,listOwner,upload.single('Listing[image]'),validateData,wrapAsync(async(req,res)=>{
     let {id} = req.params;
     await placeList.findByIdAndUpdate(id,{...req.body.Listing});
+    console.log(req.session.redirectUrl);
     req.flash("success","Edited Successfully");
-    res.redirect("/listings");
+    let listing = req.originalUrl || "/listings";
+    res.redirect(listing);
 }));
 //TODO DELETE ROUTE
 router.delete("/:id",isLogined,listOwner,wrapAsync(async(req,res)=>{

@@ -3,7 +3,7 @@
     <h1>Create New Listing</h1><br><br>
     <div class="row">
         <div class="col-8 offset-2">
-            <form action="http://localhost:8080/listings/<%= content._id %>?_method=PUT" method="post" class="needs-validation" novalidate>
+            <form action="http://localhost:8080/listings/<%= content._id %>?_method=PUT" method="post" class="needs-validation" novalidate enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title : </label><br>
                 <input type="text" value="<%= content.title %>" name="Listing[title]" class="form-control" required>
@@ -21,9 +21,10 @@
                     Description up there!!!
                 </div>
                 </div>
+                <img src="<%= content.image.url %>" alt="" srcset="" height="150px">
                 <div class="mb-3">
                     <label for="image" class="form-label">Image : </label><br>
-                <input type="text" src="" alt="" name="Listing[image][url]" value="<%= content.image.url %>" class="form-control">
+                    <input type="file" src="" alt="" name="Listing[image]" placeholder="Enter URL"  class="form-control">
                 </div>
                 <div class="mb-3">
                     <label for="price" class="form-label">Price : </label><br>
