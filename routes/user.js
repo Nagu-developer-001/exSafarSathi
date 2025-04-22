@@ -1,61 +1,62 @@
 const express = require("express");
-const router = express.Router({mergeParams:true});
+const router = express.Router({ mergeParams: true });
 const mongoose = require("mongoose");
 const User = require("../models/user.js");
 const passport = require("passport");
 const Booking = require("../models/booking.js");
 const flash = require("connect-flash");
-const { UniqueUrl,saveUrl ,validateRegister,validateUpdateUser,Re_ValidateEmail,showUrl} = require("../AuthenticLogin.js");
+const { UniqueUrl, saveUrl, validateRegister, validateUpdateUser, Re_ValidateEmail, showUrl } = require("../AuthenticLogin.js");
 const placeList = require("../models/wonderLust.js");
 const wrapAsync = require("../utils/wrapAsync.js");
 
+const multer = require("multer");
+const { storage } = require("../cloudConfigure.js");
+const upload = multer({ storage });
 
-const multer  = require('multer');
-const {storage} = require("../cloudConfigure.js");
-const upload = multer({ storage: storage });
+// User Details Route
+router.get("/userDetails/:id", wrapAsync(async (req, res) => {
+    if (!req.isAuthenticated()) {
+        req.flash("error", "You must be logged in.");
+        return res.redirect("/listings");
+    }
 
-router.get("/userDetails/:id",wrapAsync(async(req,res)=>{
-    if(!req.isAuthenticated()){
-        req.flash("error","You have to be logined");
-        res.redirect("/listings");
-    }else{
-        let {id} = req.params;
-    let user = await User.findById(id);
-    let userBooking = await Booking.find({owner:id}).populate({path:"places_list",populate:{path:"owner"}});
-    //let placeBooking = await placeList.find();
+    const { id } = req.params;
+    const user = await User.findById(id);
+    const userBooking = await Booking.find({ owner: id }).populate({ path: "places_list", populate: { path: "owner" } });
+
     console.log(userBooking);
-    res.render("./signup/userDetails.ejs",{user,userBooking});
-    }
+    return res.render("./signup/userDetails.ejs", { user, userBooking });
 }));
-router.post("/updateUser/:id/edit",upload.single('userData[image]'),validateUpdateUser,wrapAsync(async(req,res)=>{
-    if(!req.isAuthenticated()){
-        req.flash("error","You have to be logined");
-        res.redirect("/listings");
-    }else{
-    let id = req.params.id;
-    console.log(id);
-    let data = await User.findByIdAndUpdate(id,{...req.body.userData});
-    if(typeof req.file !== "undefined"){
-        let url = req.file.path;
-        let filename = req.file.filename;
-        data.image = {url,filename};
+
+// Update User
+router.post("/updateUser/:id/edit", upload.single("userData[image]"), validateUpdateUser, wrapAsync(async (req, res) => {
+    if (!req.isAuthenticated()) {
+        req.flash("error", "You must be logged in.");
+        return res.redirect("/listings");
+    }
+
+    const { id } = req.params;
+    console.log("Updating user:", id);
+
+    let data = await User.findByIdAndUpdate(id, { ...req.body.userData });
+    if (req.file) {
+        let { path: url, filename } = req.file;
+        data.image = { url, filename };
         await data.save();
-        console.log(data);
+        console.log("Updated user data:", data);
     }
-    await data.save();
-    req.flash("success","Your Personal Details Edited Successfully!");
-    console.log(id);
-    res.redirect(`/userDetails/${id}`);
-}
+
+    req.flash("success", "Your personal details were updated successfully!");
+    return res.redirect(`/userDetails/${id}`);
 }));
 
-router.get("/forgotPasswordOtp");
-router.get("/signup",wrapAsync( (req, res) => {
-    console.log("reder file for sign up");
-    res.render("./signup/signup.ejs");
+// Signup Route
+router.get("/signup", wrapAsync((req, res) => {
+    console.log("Rendering signup page");
+    return res.render("./signup/signup.ejs");
 }));
 
-router.post("/signup", validateRegister,wrapAsync( async (req, res) => {
+router.post("/signup", validateRegister, wrapAsync(async (req, res) => {
     try {
         console.log("Signup request received:", req.body);
 
@@ -66,44 +67,42 @@ router.post("/signup", validateRegister,wrapAsync( async (req, res) => {
 
         console.log("Session data saved:", req.session);
 
-        res.redirect("/validateotp"); 
+        return res.redirect("/validateotp");
     } catch (error) {
         console.error("Error in signup route:", error);
         req.flash("error", "Something went wrong. Please try again.");
-        res.redirect("/signup");
+        return res.redirect("/signup");
     }
 }));
-router.get("/validateotp",wrapAsync((req,res)=>{
-    res.render("./signup/otp.ejs");
-}));
-router.post("/validateotp",wrapAsync(async(req,res)=>{
-        let email = req.session.email;
-        let username = req.session.username;
-        let password = req.session.password;
-        
-        let otp = req.body;
-        otp = otp.otp.join("");
-        if(otp == req.session.otp){
-            const newUser = new User({ email, username });
-            const regUser = await User.register(newUser, password);
-            console.log("sending email");
-            req.login(regUser, (err) => {
-                if (err) {
-                    return next(err);
-                }
-                //requested url
-                req.flash("success","Welcome to SafarSathi");
-                res.redirect("/listings");
-            });
-        }else{
-            req.flash("error","You Entered wrong OTP");
-            res.redirect("/signup");
-        }
+
+// OTP Validation Route
+router.get("/validateotp", wrapAsync((req, res) => {
+    return res.render("./signup/otp.ejs");
 }));
 
+router.post("/validateotp", wrapAsync(async (req, res) => {
+    let { email, username, password, otp: sessionOtp } = req.session;
+    let otp = req.body.otp.join("");
 
-router.get("/login",wrapAsync( (req, res) => {
-    res.render("./signup/login.ejs");
+    if (otp === sessionOtp) {
+        const newUser = new User({ email, username });
+        const regUser = await User.register(newUser, password);
+
+        req.login(regUser, (err) => {
+            if (err) return next(err);
+
+            req.flash("success", "Welcome to SafarSathi!");
+            return res.redirect("/listings");
+        });
+    } else {
+        req.flash("error", "Incorrect OTP.");
+        return res.redirect("/signup");
+    }
+}));
+
+// Login Route
+router.get("/login", wrapAsync((req, res) => {
+    return res.render("./signup/login.ejs");
 }));
 
 router.post(
@@ -114,84 +113,75 @@ router.post(
         failureFlash: true,
     }),
     wrapAsync((req, res) => {
-        const redirectUrl = res.locals.redirectUrl ||res.locals.redirectUrlUnique|| "listings" ;
-        
-        req.flash("success", "Welcome back to SafarSathi");
+        const redirectUrl = res.locals.redirectUrl || res.locals.redirectUrlUnique || "/listings";
+        req.flash("success", "Welcome back to SafarSathi!");
         return res.redirect(redirectUrl);
-    }
-));
+    })
+);
 
-router.get("/logout",(req, res, next) => {
+// Logout Route
+router.get("/logout", (req, res, next) => {
     if (req.isAuthenticated()) {
         req.logout((err) => {
-            if (err) {
-                return next(err);
-            }
-            req.flash("success", "You logged out");
-            res.redirect("/listings");
+            if (err) return next(err);
+
+            req.flash("success", "You have logged out.");
+            return res.redirect("/listings");
         });
     } else {
-        req.flash("error", "You are not logged in");
-        res.redirect("/login");
+        req.flash("error", "You are not logged in.");
+        return res.redirect("/login");
     }
 });
-router.get("/forgotPassword",wrapAsync((req,res)=>{
-    res.render("./signup/forgotEmail.ejs");
+
+// Forgot Password Route
+router.get("/forgotPassword", wrapAsync((req, res) => {
+    return res.render("./signup/forgotEmail.ejs");
 }));
 
+router.post("/forgotPasswordOtp", wrapAsync(async (req, res) => {
+    let { Re_email, passwordName, password, Cpassword } = req.body;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-router.post("/forgotPasswordOtp",wrapAsync(async(req,res)=>{
-    let {Re_email,passwordName,password,Cpassword} = req.body;
     req.session.Re_email = Re_email;
     req.session.passwordName = passwordName;
     req.session.password = password;
     req.session.Cpassword = Cpassword;
-    let listingUser = await User.findOne({username:passwordName});
-    console.log(listingUser);
-    if(!listingUser){
-        req.flash("error","Account not found!!");
-        console.log("ERROR-A/c not found");
+
+    let listingUser = await User.findOne({ username: passwordName });
+    console.log("Found user:", listingUser);
+
+    if (!listingUser) {
+        req.flash("error", "Account not found!");
+        console.log("ERROR - Account not found");
         return res.redirect("/forgotPassword");
     }
-    if(password!=Cpassword){
-        req.flash("error","write the both password correctly!");
+
+    if (password !== Cpassword) {
+        req.flash("error", "Passwords do not match!");
         return res.redirect("/forgotPassword");
     }
-    res.redirect("/validatePasswordOtp");
+
+    return res.redirect("/validatePasswordOtp");
 }));
-router.get("/validatePasswordOtp",Re_ValidateEmail,(req,res)=>{
-    res.render("signup/passwordOtp.ejs");
+
+router.get("/validatePasswordOtp", Re_ValidateEmail, (req, res) => {
+    return res.render("signup/passwordOtp.ejs");
 });
-router.post("/validatePasswordOtp",wrapAsync(async(req,res)=>{
-    let Re_email = req.session.Re_email;
-    let listingUser = await User.findOne({username:req.session.passwordName});
-    await listingUser.setPassword(req.session.Cpassword);
+
+router.post("/validatePasswordOtp", wrapAsync(async (req, res) => {
+    let { passwordName, Cpassword } = req.session;
+
+    let listingUser = await User.findOne({ username: passwordName });
+    if (!listingUser) {
+        req.flash("error", "Account not found!");
+        return res.redirect("/forgotPassword");
+    }
+
+    await listingUser.setPassword(Cpassword);
     await listingUser.save();
-    req.flash("success","Successfully Updated password!");
-    res.redirect("/login");
+
+    req.flash("success", "Successfully updated password!");
+    return res.redirect("/login");
 }));
+
 module.exports = router;

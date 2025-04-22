@@ -7,150 +7,107 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const ExpressErr = require("../utils/ExpressErr.js");
 const passport = require("passport");
 
+const multer = require("multer");
+const { storage } = require("../cloudConfigure.js");
+const upload = multer({ storage });
 
-const multer  = require('multer');
-const {storage} = require("../cloudConfigure.js");
-const upload = multer({  storage });
+const { isLogined, listOwner, UniqueUrl, validateData, saveUrl, showUrl } = require("../AuthenticLogin.js");
 
-
-const {isLogined,listOwner,UniqueUrl,validateData, saveUrl,showUrl} = require("../AuthenticLogin.js");
-// const {} =require("../AuthenticLogin.js");
-
-
-//todo TESTING ROUTE
-router.get("/api/TestListings",async(req,res)=>{
-    place = [{
-                title: "Cozy Beachfront Cottage111",
-                description:
-                    "Escape to this charming beachfront cottage for a relaxing getaway. Enjoy stunning ocean views and easy access to the beach.",
-                image: {
-                    filename: "listingimage",
-                    url: "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHRyYXZlbHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
-        },
+// Test Route
+router.get("/api/TestListings", wrapAsync(async (req, res) => {
+    const place = [{
+        title: "Cozy Beachfront Cottage",
+        description: "Escape to this charming beachfront cottage for a relaxing getaway.",
+        image: { filename: "listingimage", url: "https://images.unsplash.com/photo-1552733407..." },
         price: 1500,
         location: "Malibu",
         country: "United States",
-        }]
-        let x = await placeList.insertMany(place);
-        console.log(x);
-});
-//TODO INDEX ROUTE
-router.get("/",wrapAsync(async(req,res)=>{
+    }];
+
+    let x = await placeList.insertMany(place);
+    console.log(x);
+    res.json(x); // Use res.json to send a proper response
+}));
+
+// Index Route
+router.get("/", wrapAsync(async (req, res) => {
     let allListing = await placeList.find({});
-    console.log("allListing");
-    res.render("listings/index.ejs",{allListing});
+    console.log("Fetched Listings");
+    return res.render("listings/index.ejs", { allListing }); // Ensure return to prevent extra execution
 }));
-//TODO NEW ROUTE
-router.get("/new",isLogined,wrapAsync((req,res)=>{
-        console.log(req.locals);
-        res.render("listings/newForm.ejs");
-}));
-//TODO CREATE ROUTE
-router.post("/",isLogined,upload.single('Listing[image]'),validateData,async(req,res)=>{
-    // if(!req.body.Listing){
-    //     next( new ExpressErr(402,"INTERNAL SERVER ERROR"));
-    // }
-    
-        console.log("Headers:", req.headers);
-        console.log("Method:", req.method);
-        console.log("Body:", req.body);
-        let url = req.file.path;
-    let filename = req.file.filename;
-    console.log("hello");
+
+// New Listing Form
+router.get("/new", isLogined, (req, res) => {
+    console.log(res.locals);
+    return res.render("listings/newForm.ejs");
+});
+
+// Create Listing
+router.post("/", isLogined, upload.single("Listing[image]"), validateData, wrapAsync(async (req, res) => {
+    if (!req.body.Listing) {
+        throw new ExpressErr(400, "Invalid Listing Data");
+    }
+
+    console.log("Headers:", req.headers);
+    console.log("Method:", req.method);
+    console.log("Body:", req.body);
+
+    const { path: url, filename } = req.file;
     let placeLists = req.body.Listing;
     placeLists.owner = req.user._id;
-    placeLists.image = {url,filename}
-    console.log(placeLists);
-    let placeAdd = await placeList.insertMany(placeLists);
-    console.log(placeAdd);
-    req.flash("success","New Listing is Created!!!");
-    res.redirect("/listings");
-    // placeLists.owner = req.user._id;
-    // let placeAdd = await placeList.insertMany(placeLists);
+    placeLists.image = { url, filename };
 
-    // placeAdd.owner = req.user._id;
-    // await placeAdd.save();
-    // console.log(placeAdd);
-    // req.flash("success","New Listing is Created!!!");
-    // res.redirect("/listings");
-});
-router.get('/list/:category', async(req, res) => {
-    const categori = req.params.category;
-    req.session.catFiler = categori;
-    //console.log(req.session.catFiler,categori);
-    let categories = {
-        Trending:"Trending",
-        rooms:"rooms",
-        iconicCities:"Iconiccities",
-        Mountains:"Mountains",
-        Castles:"Castles",
-        Religion:"Religion",
-        Camping:"Camping",
-        Farms:"Farms",
-        Arctic:"Arctic",
-        Waterfall:"Waterfall"
-    };
-    if(categories[categori]){
-        console.log(categories[categori],categori);
-        allListing = await placeList.find({category:categori});
-        console.log(allListing," - Total - Listings");
-        res.render("listings/index.ejs",{allListing});
-    }else{
-        console.log("no data found");
-        res.redirect("/listings");
-    }
-});
-//TODO SHOW ROUTE
-router.get("/:id",UniqueUrl,wrapAsync(async(req,res,next)=>{
-    let {id} = req.params;
-    let content = await placeList.findById(id).populate({path:"reviews",populate:{path:"author"}}).populate("owner");
-    if(!content){
-        req.flash("error","Your searching for this content is not found");
+    await placeList.insertMany(placeLists);
+    req.flash("success", "New Listing is Created!");
+
+    return res.redirect("/listings");
+}));
+
+// Show Route
+router.get("/:id", UniqueUrl, wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    let content = await placeList.findById(id)
+        .populate({ path: "reviews", populate: { path: "author" } })
+        .populate("owner");
+
+    if (!content) {
+        req.flash("error", "Content Not Found");
         return res.redirect("/listings");
     }
-    // if(!req.isAuthenticated()){
-    //     req.flash("error","If you want to add review Please log-in to our System!!!");
-    //      next();
-    // }
-    console.log(content);
-    //
-    res.render("listings/show.ejs",{content});
+
+    return res.render("listings/show.ejs", { content });
 }));
 
+// Edit Route
+router.get("/:id/edit", isLogined, saveUrl, listOwner, wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    console.log("Listing ID:", id);
 
-//TODO EDIT ROUTE
-router.get("/:id/edit",isLogined,saveUrl,listOwner,wrapAsync(async(req,res)=>{
-    let {id} = req.params;
-    console.log("Listing id :--",id);
-    console.log("Listing id :--",id);
-    console.log("Authenticated user : ",res.locals.nowUser._id);
     let content = await placeList.findById(id);
-    console.log("owner id : -- :  ",content.owner._id);
-    //console.log(content);
-    if(!content){
-        req.flash("error","This list is not exist!!");
-        res.redirect("/listings");
-    }else{
-        res.render("listings/edit.ejs",{content});
+    if (!content) {
+        req.flash("error", "Listing does not exist!");
+        return res.redirect("/listings");
     }
-}));
-//TODO UPDATE ROUTE
-router.put("/:id",isLogined,UniqueUrl,listOwner,upload.single('Listing[image]'),validateData,wrapAsync(async(req,res)=>{
-    let {id} = req.params;
-    await placeList.findByIdAndUpdate(id,{...req.body.Listing});
-    console.log(req.session.redirectUrl);
-    req.flash("success","Edited Successfully");
-    let listing = req.originalUrl || "/listings";
-    res.redirect(listing);
-}));
-//TODO DELETE ROUTE
-router.delete("/:id",isLogined,listOwner,wrapAsync(async(req,res)=>{
-    let {id} = req.params;
-    let deleteEle = await placeList.findByIdAndDelete(id);
-    req.flash("success","Deleted Successfully");
-    res.redirect("/listings");
+
+    return res.render("listings/edit.ejs", { content });
 }));
 
+// Update Route
+router.put("/:id", isLogined, UniqueUrl, listOwner, upload.single("Listing[image]"), validateData, wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    await placeList.findByIdAndUpdate(id, { ...req.body.Listing });
 
+    req.flash("success", "Edited Successfully");
+    return res.redirect(req.originalUrl || "/listings");
+}));
+
+// Delete Route
+router.delete("/:id", isLogined, listOwner, wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    await placeList.findByIdAndDelete(id);
+
+    req.flash("success", "Deleted Successfully");
+    return res.redirect("/listings");
+}));
 
 module.exports = router;
