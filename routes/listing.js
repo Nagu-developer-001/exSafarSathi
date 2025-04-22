@@ -106,7 +106,7 @@ router.get("/:id",UniqueUrl,wrapAsync(async(req,res,next)=>{
     let content = await placeList.findById(id).populate({path:"reviews",populate:{path:"author"}}).populate("owner");
     if(!content){
         req.flash("error","Your searching for this content is not found");
-        res.redirect("/listings");
+        return res.redirect("/listings");
     }
     // if(!req.isAuthenticated()){
     //     req.flash("error","If you want to add review Please log-in to our System!!!");
