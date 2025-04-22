@@ -21,6 +21,9 @@ app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 app.use(methodOverload("_method"));
 const ExpressErr = require("./utils/ExpressErr.js");
+const MongoStore = require("connect-mongo");
+
+
 
 let listingRouter = require("./routes/listing.js");
 let reviewsRouter = require("./routes/review.js");
@@ -36,13 +39,24 @@ const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
+const db_url = process.env.ATLASDB_URL;
 
-
-
+const store = MongoStore.create({
+    mongoUrl:db_url,
+    crypto:{
+      secret:process.env.SECRET,
+    },
+    touchAfter:24 * 3600,
+  });
+  
+  store.on("error",()=>{
+    console.log("ERROR IN MONGO SESSION STORE",err)
+  });
 
 
 const sessionOptions = 
-    {secret:"set_your_secret",
+    {
+        store,secret:"set_your_secret",
     resave:false,
     saveUninitialized:true,
     cookie:{
@@ -83,7 +97,7 @@ app.use("/",reviewsRouter);
 
 
 // const review = require("./models/review.js");
-const db_url = process.env.ATLASDB_URL;
+
 console.log(db_url);
 console.log(ExpressErr);
 main().then((res)=>{

@@ -107,17 +107,14 @@ router.get("/login",wrapAsync( (req, res) => {
 }));
 
 router.post(
-    "/login",UniqueUrl,
+    "/login",
     saveUrl,
     passport.authenticate("local", {
         failureRedirect: "/login",
         failureFlash: true,
     }),
     wrapAsync((req, res) => {
-        const redirectUrl = res.locals.redirectUrl || "listings" ;
-        if(req.session.showUrl){
-            redirectUrl = req.session.showUrl
-        }
+        const redirectUrl = res.locals.redirectUrl ||res.locals.redirectUrlUnique|| "listings" ;
         
         req.flash("success", "Welcome back to SafarSathi");
         return res.redirect(redirectUrl);

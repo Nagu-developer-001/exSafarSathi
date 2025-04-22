@@ -100,6 +100,23 @@ module.exports.isLogined = (req, res, next) => {
     next();
 };
 
+module.exports.UniqueUrl = (req,res,next)=>{
+    req.session.redirectUrlUnique = req.originalUrl;
+    console.log(req.session.redirectUrlUnique)
+    console.log(req.originalUrl);
+    next(); 
+}
+module.exports.saveUrl = (req, res, next) => {
+    if (req.session.redirectUrl) {
+        res.locals.redirectUrl = req.session.redirectUrl; 
+        console.log(res.locals.redirectUrl);
+    }
+    if(!req.session.redirectUrl){
+        res.locals.redirectUrlUnique = req.session.redirectUrlUnique;
+    }
+    next();
+};
+
 module.exports.validateUpdateUser = (req,res,next) =>{
     if (req.isAuthenticated()) {
         let err = validateUpdateUser.validate(req.body);
@@ -112,30 +129,7 @@ module.exports.validateUpdateUser = (req,res,next) =>{
         next();
     }
 };
-module.exports.showUrl =  (req,res,next)=>{
-    if (!req.session.redirectUrl) {
-    req.session.showUrl = req.originalUrl;
-    console.log(req.session.showUrl);
-    }
-    next();
-}
 
-module.exports.UniqueUrl = (req,res,next)=>{
-    req.session.redirectUrlUnique = req.originalUrl;
-    console.log("unique url - ",req.session.redirectUrlUnique)
-    console.log("unique - ",req.originalUrl);
-    next(); 
-}
-module.exports.saveUrl = (req, res, next) => {
-    if (req.session.redirectUrl) {
-        res.locals.redirectUrl = req.session.redirectUrlUnique; 
-        console.log(res.locals.redirectUrl);
-    }
-    // if(!req.session.redirectUrl){
-    //     res.locals.redirectUrlUnique = req.session.redirectUrlUnique;
-    // }
-    next();
-};
 
 module.exports.listOwner = async(req,res,next) =>{
     let { id } = req.params;

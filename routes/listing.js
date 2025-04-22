@@ -101,7 +101,7 @@ router.get('/list/:category', async(req, res) => {
     }
 });
 //TODO SHOW ROUTE
-router.get("/:id",showUrl,wrapAsync(async(req,res,next)=>{
+router.get("/:id",UniqueUrl,wrapAsync(async(req,res,next)=>{
     let {id} = req.params;
     let content = await placeList.findById(id).populate({path:"reviews",populate:{path:"author"}}).populate("owner");
     if(!content){
