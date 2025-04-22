@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const placeList = require("../models/wonderLust.js");
-const validateUserData = require("../joiSchema.js");
 const wrapAsync = require("../utils/wrapAsync.js");
 const ExpressErr = require("../utils/ExpressErr.js");
 const passport = require("passport");
@@ -25,20 +24,20 @@ router.get("/api/TestListings", wrapAsync(async (req, res) => {
     }];
 
     let x = await placeList.insertMany(place);
-    console.log(x);
-    res.json(x); // Use res.json to send a proper response
+    console.log("Inserted Test Listing:", x);
+    return res.json(x); // Ensure response stops execution
 }));
 
 // Index Route
 router.get("/", wrapAsync(async (req, res) => {
     let allListing = await placeList.find({});
-    console.log("Fetched Listings");
-    return res.render("listings/index.ejs", { allListing }); // Ensure return to prevent extra execution
+    console.log("Fetched Listings:", allListing);
+    return res.render("listings/index.ejs", { allListing });
 }));
 
 // New Listing Form
 router.get("/new", isLogined, (req, res) => {
-    console.log(res.locals);
+    console.log("User Data:", res.locals);
     return res.render("listings/newForm.ejs");
 });
 
@@ -48,9 +47,14 @@ router.post("/", isLogined, upload.single("Listing[image]"), validateData, wrapA
         throw new ExpressErr(400, "Invalid Listing Data");
     }
 
-    console.log("Headers:", req.headers);
-    console.log("Method:", req.method);
-    console.log("Body:", req.body);
+    console.log("Request Headers:", req.headers);
+    console.log("Request Method:", req.method);
+    console.log("Request Body:", req.body);
+
+    if (!req.file) {
+        req.flash("error", "Image Upload Failed!");
+        return res.redirect("/new");
+    }
 
     const { path: url, filename } = req.file;
     let placeLists = req.body.Listing;
@@ -58,7 +62,7 @@ router.post("/", isLogined, upload.single("Listing[image]"), validateData, wrapA
     placeLists.image = { url, filename };
 
     await placeList.insertMany(placeLists);
-    req.flash("success", "New Listing is Created!");
+    req.flash("success", "New Listing Created!");
 
     return res.redirect("/listings");
 }));
@@ -71,7 +75,7 @@ router.get("/:id", UniqueUrl, wrapAsync(async (req, res) => {
         .populate("owner");
 
     if (!content) {
-        req.flash("error", "Content Not Found");
+        req.flash("error", "Listing Not Found");
         return res.redirect("/listings");
     }
 
@@ -81,7 +85,7 @@ router.get("/:id", UniqueUrl, wrapAsync(async (req, res) => {
 // Edit Route
 router.get("/:id/edit", isLogined, saveUrl, listOwner, wrapAsync(async (req, res) => {
     let { id } = req.params;
-    console.log("Listing ID:", id);
+    console.log("Editing Listing:", id);
 
     let content = await placeList.findById(id);
     if (!content) {
@@ -95,10 +99,16 @@ router.get("/:id/edit", isLogined, saveUrl, listOwner, wrapAsync(async (req, res
 // Update Route
 router.put("/:id", isLogined, UniqueUrl, listOwner, upload.single("Listing[image]"), validateData, wrapAsync(async (req, res) => {
     let { id } = req.params;
-    await placeList.findByIdAndUpdate(id, { ...req.body.Listing });
+    let updatedData = { ...req.body.Listing };
 
-    req.flash("success", "Edited Successfully");
-    return res.redirect(req.originalUrl || "/listings");
+    if (req.file) {
+        updatedData.image = { url: req.file.path, filename: req.file.filename };
+    }
+
+    await placeList.findByIdAndUpdate(id, updatedData);
+
+    req.flash("success", "Listing Updated Successfully");
+    return res.redirect(`/listings/${id}`);
 }));
 
 // Delete Route
@@ -106,7 +116,7 @@ router.delete("/:id", isLogined, listOwner, wrapAsync(async (req, res) => {
     let { id } = req.params;
     await placeList.findByIdAndDelete(id);
 
-    req.flash("success", "Deleted Successfully");
+    req.flash("success", "Listing Deleted Successfully");
     return res.redirect("/listings");
 }));
 
