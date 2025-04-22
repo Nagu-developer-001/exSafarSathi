@@ -52,7 +52,7 @@ app.use(express.json());
 app.use(methodOverride("_method"));
 
 app.use(session(sessionOptions));
-app.use(flash());
+app.use(flash())
 app.use(passport.initialize());
 app.use(passport.session());
 
