@@ -3,11 +3,10 @@ const router = express.Router({ mergeParams: true });
 const mongoose = require("mongoose");
 const placeList = require("../models/wonderLust.js");
 const Review = require("../models/review.js");
-const wrapAsync = require("../utils/wrapAsync.js");
 const { validateRating, isLogined } = require("../AuthenticLogin.js");
 
 // Posting Reviews
-router.post("/listings/:id/reviews", isLogined, validateRating, wrapAsync(async (req, res) => {
+router.post("/listings/:id/reviews", isLogined, validateRating, async (req, res, next) => {
     try {
         const { id } = req.params;
         console.log("Processing review for listing:", id);
@@ -32,10 +31,10 @@ router.post("/listings/:id/reviews", isLogined, validateRating, wrapAsync(async 
         req.flash("error", "Something went wrong while adding the review.");
         return res.redirect(`/listings/${req.params.id}`);
     }
-}));
+});
 
 // Deleting Reviews
-router.delete("/listings/:id/reviews/:reviewsId", wrapAsync(async (req, res) => {
+router.delete("/listings/:id/reviews/:reviewsId", async (req, res, next) => {
     try {
         const { id, reviewsId } = req.params;
         console.log("Attempting to delete review:", reviewsId);
@@ -50,6 +49,6 @@ router.delete("/listings/:id/reviews/:reviewsId", wrapAsync(async (req, res) => 
         req.flash("error", "Failed to delete review.");
         return res.redirect(`/listings/${id}`);
     }
-}));
+});
 
 module.exports = router;

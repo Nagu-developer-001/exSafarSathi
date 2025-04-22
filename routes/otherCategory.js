@@ -5,44 +5,49 @@ const Booking = require("../models/booking.js");
 const { UniqueUrl } = require("../AuthenticLogin.js");
 const placeList = require("../models/wonderLust.js");
 const { isLogined, listOwner } = require("../AuthenticLogin.js");
-const wrapAsync = require("../utils/wrapAsync.js");
 
-router.get("/booking/:id", isLogined, wrapAsync(async (req, res) => {
-    const userId = req.user._id;
-    const bookingId = req.params.id;
+// Booking Route
+router.get("/booking/:id", isLogined, async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const bookingId = req.params.id;
 
-    console.log(userId, bookingId);
+        console.log("User ID:", userId, "Booking ID:", bookingId);
 
-    const user = await User.findById(userId);
-    const places = await placeList.findById(bookingId).populate("owner");
+        const user = await User.findById(userId);
+        const places = await placeList.findById(bookingId).populate("owner");
 
-    // Check if the user has already booked this accommodation
-    let existingBooking = await Booking.findOne({ owner: userId, title: places.title });
+        // Check if the user has already booked this accommodation
+        let existingBooking = await Booking.findOne({ owner: userId, title: places.title });
 
-    console.log("Existing Booking:", existingBooking);
-    if (existingBooking) {
-        req.flash("error", "You have already booked this accommodation.");
+        console.log("Existing Booking:", existingBooking);
+        if (existingBooking) {
+            req.flash("error", "You have already booked this accommodation.");
+            return res.redirect(`/listings/${bookingId}`);
+        }
+
+        let newBooking = new Booking({
+            bookingCount: 1,
+            title: places.title,
+            places_list: bookingId,
+            owner: userId
+        });
+
+        await newBooking.save();
+
+        // Mark user as booked
+        user.hasBooked = true;
+        await user.save();
+
+        req.flash("success", "Thank you for your registration!");
         return res.redirect(`/listings/${bookingId}`);
+    } catch (error) {
+        next(error);
     }
+});
 
-    let newBooking = new Booking({
-        bookingCount: 1,
-        title: places.title,
-        places_list: bookingId,
-        owner: userId
-    });
-
-    await newBooking.save();
-
-    // Mark user as booked
-    user.hasBooked = true;
-    await user.save();
-
-    req.flash("success", "Thank you for your registration!");
-    return res.redirect(`/listings/${bookingId}`);
-}));
-
-router.delete("/del/:id", isLogined, wrapAsync(async (req, res) => {
+// Delete Booking Route
+router.delete("/del/:id", isLogined, async (req, res, next) => {
     try {
         await Booking.findByIdAndDelete(req.params.id);
         req.flash("success", "Successfully cancelled your booking order");
@@ -50,38 +55,45 @@ router.delete("/del/:id", isLogined, wrapAsync(async (req, res) => {
     } catch (error) {
         res.status(500).send(error.message);
     }
-}));
+});
 
-router.get("/FAQ", UniqueUrl, wrapAsync((req, res) => {
+// FAQ Page Route
+router.get("/FAQ", UniqueUrl, (req, res) => {
     return res.render("./listings/faq.ejs");
-}));
+});
 
-router.get("/help", UniqueUrl, wrapAsync((req, res) => {
+// Help Page Route
+router.get("/help", UniqueUrl, (req, res) => {
     return res.render("./listings/help.ejs");
-}));
+});
 
-router.get("/search", wrapAsync(async (req, res) => {
-    let { searchQuery } = req.query;
+// Search Route
+router.get("/search", async (req, res, next) => {
+    try {
+        let { searchQuery } = req.query;
 
-    if (!searchQuery) {
-        req.flash("error", "Sorry, no matching listings found.");
-        return res.redirect(`/listings`);
+        if (!searchQuery) {
+            req.flash("error", "Sorry, no matching listings found.");
+            return res.redirect(`/listings`);
+        }
+
+        req.session.searchQuery = searchQuery;
+
+        let allListing = await placeList.find({
+            $or: [{ title: { $regex: searchQuery, $options: "i" } }]
+        });
+
+        console.log(`Searching for ${searchQuery}:`, allListing);
+
+        if (!allListing.length) {
+            req.flash("error", "Sorry, no matching listings found.");
+            return res.redirect(`/listings`);
+        }
+
+        return res.render("listings/index.ejs", { allListing });
+    } catch (error) {
+        next(error);
     }
-
-    req.session.searchQuery = searchQuery;
-
-    let allListing = await placeList.find({
-        $or: [{ title: { $regex: searchQuery, $options: "i" } }]
-    });
-
-    console.log(`Searching for ${searchQuery}:`, allListing);
-
-    if (!allListing.length) {
-        req.flash("error", "Sorry, no matching listings found.");
-        return res.redirect(`/listings`);
-    }
-
-    return res.render("listings/index.ejs", { allListing });
-}));
+});
 
 module.exports = router;
