@@ -33,7 +33,7 @@ store.on("error", (err) => {
 
 const sessionOptions = {
     store,
-    secret: "set_your_secret",
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
