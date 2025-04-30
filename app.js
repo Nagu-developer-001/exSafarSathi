@@ -43,7 +43,7 @@ const sessionOptions = {
     },
 };
 
-app.engine("ejs", ejsMate);
+app.engine("ejs", );
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "/public")));
@@ -76,7 +76,7 @@ app.use("/", require("./routes/review.js"));
 
 // Connecting to MongoDB
 async function main() {
-    await mongoose.connect(db_url);
+    await mongoose.connect(process.env.ATLASDB_URL);
 }
 
 main()
