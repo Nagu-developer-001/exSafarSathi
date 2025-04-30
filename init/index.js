@@ -11,7 +11,7 @@ main().then((res) =>{
 
 
 async function main(){
-    await mongoose.connect("mongodb://127.0.0.1:27017/wonderLust")
+    await mongoose.connect("mongodb://127.0.0.1:27017/wonderLust");
 }
 
 const dataInitialization = async()=>{
