@@ -58,7 +58,7 @@ router.get("/booking/:id", isLogined, async (req, res, next) => {
     // **Manually Add Table Data**
     let startY = 40;
     doc.setFont("helvetica", "bold");
-    doc.text("Place name        Price    ", 14, );
+    doc.text("Place name        Price    ", 14, startY);
 
     doc.setFont("helvetica", "normal");
     //let index = 0;
