@@ -19,17 +19,17 @@ const User = require("./models/user.js");
 
 const db_url = process.env.ATLASDB_URL;
 
-const store = MongoStore.create({
-    mongoUrl: db_url,
-    crypto: {
-        secret: process.env.SECRET,
-    },
-    touchAfter: 24 * 3600,
-});
+// const store = MongoStore.create({
+//     mongoUrl: db_url,
+//     crypto: {
+//         secret: process.env.SECRET,
+//     },
+//     touchAfter: 24 * 3600,
+// });
 
-store.on("error", (err) => {
-    console.error("ERROR IN MONGO SESSION STORE:", err);
-});
+// store.on("error", (err) => {
+//     console.error("ERROR IN MONGO SESSION STORE:", err);
+// });
 
 const sessionOptions = {
     secret: process.env.SECRET || "vdvdvd",
@@ -75,7 +75,7 @@ app.use("/", require("./routes/review.js"));
 
 // Connecting to MongoDB
 async function main() {
-    await mongoose.connect(process.env.ATLASDB_URL);
+    await mongoose.connect("mongodb://127.0.0.1:27017/wonderLust");
 }
 
 main()

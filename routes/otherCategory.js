@@ -5,10 +5,14 @@ const Booking = require("../models/booking.js");
 const { UniqueUrl } = require("../AuthenticLogin.js");
 const placeList = require("../models/wonderLust.js");
 const { isLogined, listOwner } = require("../AuthenticLogin.js");
+const { jsPDF } = require("jspdf");
+const autoTable = require("jspdf-autotable");
+
 
 // Booking Route
 router.get("/booking/:id", isLogined, async (req, res, next) => {
     try {
+
         const userId = req.user._id;
         const bookingId = req.params.id;
 
@@ -40,7 +44,39 @@ router.get("/booking/:id", isLogined, async (req, res, next) => {
         await user.save();
 
         req.flash("success", "Thank you for your registration!");
-        return res.redirect(`/listings/${bookingId}`);
+
+        // **Generate PDF for the booking confirmation**
+// Sample booking data
+// const bookings = [
+//     { eventName: "Music Concert", createdDate: "2024-04-10", eventDate: "2024-05-12", price: "500", viewedByAdmin: true, completed: false },
+//     { eventName: "Art Exhibition", createdDate: "2024-04-15", eventDate: "2024-06-05", price: "300", viewedByAdmin: false, completed: true }
+// ];
+
+    const doc = new jsPDF();
+    doc.text("My Bookings", 14, 20);
+
+    // **Manually Add Table Data**
+    let startY = 40;
+    doc.setFont("helvetica", "bold");
+    doc.text("Place name        Price    ", 14, startY);
+
+    doc.setFont("helvetica", "normal");
+    //let index = 0;
+    //for (const b of places) {
+    startY += 10; // Increment Y position for each row
+    doc.text(
+        `${places.title}    ₹${places.price}`,
+        14,
+        startY
+    );
+    //index++;
+//}
+
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=My_Bookings.pdf");
+    res.send(doc.output());
+
     } catch (error) {
         next(error);
     }
