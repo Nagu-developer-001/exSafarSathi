@@ -32,7 +32,6 @@ store.on("error", (err) => {
 });
 
 const sessionOptions = {
-    store,
     secret: process.env.SECRET || "vdvdvd",
     resave: false,
     saveUninitialized: true,
