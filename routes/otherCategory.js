@@ -20,6 +20,11 @@ router.get("/booking/:id", isLogined, async (req, res, next) => {
 
         const user = await User.findById(userId);
         const places = await placeList.findById(bookingId).populate("owner");
+        
+        if (places.owner._id.equals(userId)) {
+            req.flash("error", "You cannot book your own listing.");
+            return res.redirect(`/listings/${bookingId}`);
+        }
 
         // Check if the user has already booked this accommodation
         let existingBooking = await Booking.findOne({ owner: userId, title: places.title });

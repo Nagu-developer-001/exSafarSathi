@@ -94,7 +94,10 @@ app.get("/registerDemoUser", async (req, res) => {
     let newDataDemo = await User.register(newUser, "helloworld");
     res.send(newDataDemo);
 });
-
+app.get("listings/:id/userlist", (req, res) => {
+    console.log(req.params);
+    //let id = req.params;
+});
 // Error Handling Middleware
 app.all("*", (req, res, next) => {
     return next(new ExpressErr(404, "PAGE NOT FOUND!!"));

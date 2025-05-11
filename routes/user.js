@@ -12,7 +12,24 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const multer = require("multer");
 const { storage } = require("../cloudConfigure.js");
 const upload = multer({ storage });
+router.get("/userlist/:id", async(req, res) => {
+    console.log(req.params);
+    let id = req.params.id;
+    async function getPlacesByOwner(ownerId) {
+        if (!mongoose.Types.ObjectId.isValid(ownerId)) {
+            console.log("Invalid Owner ID format");
+            return;
+        }
+    
+        const places = await placeList.find({ owner:new mongoose.Types.ObjectId(ownerId) });
+        console.log("Places owned by user:", places);
+        return res.render("./signup/ownedList.ejs",{places});
+    }
+    
+    getPlacesByOwner(id);
 
+    
+});
 // User Details Route
 router.get("/userDetails/:id", wrapAsync(async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -24,10 +41,9 @@ router.get("/userDetails/:id", wrapAsync(async (req, res) => {
     const user = await User.findById(id);
     const userBooking = await Booking.find({ owner: id }).populate({ path: "places_list", populate: { path: "owner" } });
 
-    console.log(userBooking);
+    console.log(user);
     return res.render("./signup/userDetails.ejs", { user, userBooking });
 }));
-
 // Update User
 router.post("/updateUser/:id/edit", upload.single("userData[image]"), validateUpdateUser, wrapAsync(async (req, res) => {
     if (!req.isAuthenticated()) {

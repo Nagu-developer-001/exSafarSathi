@@ -9,9 +9,13 @@ const { validateRating, isLogined } = require("../AuthenticLogin.js");
 router.post("/listings/:id/reviews", isLogined, validateRating, async (req, res, next) => {
     try {
         const { id } = req.params;
+        console.log(req.user._id);
         console.log("Processing review for listing:", id);
-
         let listing = await placeList.findById(id);
+        if (listing.owner._id.equals(req.user._id)) {
+            req.flash("error", "You cannot book your own listing.");
+            return res.redirect(`/listings/${id}`);
+        }
         if (!listing) {
             req.flash("error", "Listing not found!");
             return res.redirect(`/listings/${id}`);

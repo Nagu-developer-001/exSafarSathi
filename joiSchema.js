@@ -6,6 +6,7 @@ module.exports.validateUserData = Joi.object({
         description:Joi.string().required(),
         price:Joi.number().required().min(0),
         image:Joi.object({url:Joi.string()}).required(),//allow("",null),
+        category:Joi.string().required(),
         location:Joi.string().required(),
         country:Joi.string().required(),
     }).required(),

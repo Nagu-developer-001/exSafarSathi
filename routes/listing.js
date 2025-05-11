@@ -96,7 +96,33 @@ router.get("/:id", UniqueUrl, async (req, res, next) => {
         next(error);
     }
 });
-
+router.get('/list/:category', async(req, res) => {
+    const categori = req.params.category;
+    //req.session.catFiler = categori;
+    //console.log(category);
+    let categories = {
+        Trending:"Trending",
+        rooms:"rooms",
+        iconicCities:"iconicCities",
+        Mountains:"Mountains",
+        Castles:"Castles",
+        Religion:"Religion",
+        Camping:"Camping",
+        Farms:"Farms",
+        Arctic:"Arctic",
+        Waterfall:"Waterfall"
+    };
+    if(categories[categori]){
+        allListing = await placeList.find({category:categori});
+        //console.log(allListing);
+        res.render("listings/index.ejs",{allListing});
+    }else{
+        console.log("no data found");
+        req.flash("error","no data found");
+        res.redirect("/listings");
+    }
+    //console.log("category - ",categories[category]);
+});
 // Edit Route
 router.get("/:id/edit", isLogined, saveUrl, listOwner, async (req, res, next) => {
     try {

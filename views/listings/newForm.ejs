@@ -1,4 +1,24 @@
 <%- layout("/layout/boilerplate") %>
+<style>
+    select {
+            font-size: 16px !important;
+            padding: 8px !important;
+            border-radius: 5px !important;
+            border: 2px solid #333 !important;
+            width: 200px !important; /* Adjust width as needed */
+
+        }
+        .dropdown-container {
+        position: relative !important;
+    }
+
+    select option {
+        max-height: 100px !important; /* Adjust height */
+        overflow-y: auto !important; /* Enables scrolling */
+    }
+</style>
+
+
 <body>
     <h3>Create New Listing</h3><br>
     <div class="row">
@@ -16,7 +36,34 @@
                     </div>
                     <div class="invalid-feedback">
                         Description up there!!!
-                    </div></div>
+                    </div>
+                </div>
+                <div class="dropdown-container mb-3">
+                    <label for="category" class="form-label">Category : </label><br>
+                    <select class="form-select form-select-sm travelSelect" name="category" aria-label="Default select example" >
+                        <option selected>Open this select menu</option>
+                        <option value="Trending">Trending</option>
+                        <option value="rooms">rooms</option>
+                        <option value="iconicCities">iconicCities</option>
+                        <option value="Castles">Castles</option>
+                        <option value="Religion">Religion</option>
+                        <option value="Camping">Camping</option>
+                        <option value="Farms">Farms</option>
+                        <option value="Arctic">Arctic</option>
+                        <option value="Waterfall">Waterfall</option>
+                    </select>
+                </div>
+                <!--
+                Trending:"Trending",
+        rooms:"rooms",
+        iconicCities:"iconicCities",
+        Mountains:"Mountains",
+        Castles:"Castles",
+        Religion:"Religion",
+        Camping:"Camping",
+        Farms:"Farms",
+        Arctic:"Arctic",
+        Waterfall:"Waterfall"-->
                 <div class="mb-3">
                     <label for="image" class="form-label">Upload Image : </label>
                 <input type="file" src="" alt="" name="Listing[image]" placeholder="Enter URL"  class="form-control" required>
