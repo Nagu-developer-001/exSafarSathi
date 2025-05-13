@@ -148,7 +148,12 @@ body{
 }
 .card-dark{
     background-color: #C4D9FF !important;
+       color: #fff !important;
 }
+.card-light {
+       background-color: #fff;
+       color: #000;
+   }
 .solids{
     color: #fe424d !important;
     background-color: white;

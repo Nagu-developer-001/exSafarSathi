@@ -77,7 +77,7 @@ module.exports.validateRating = (req,res,next)=>{
 module.exports.validateData = (req,res,next)=>{
     console.log(req.body);
     console.log("ERROR IS OCCURING");
-    console.log(req.body);
+    console.log(req.body.Listing);
     let err = validateUserData.validate(req.body);//TODO ANOTHER WAY TO GET THE MULTIPLE DATA FROM FORM ...
     
     console.log(err,"hllo error");

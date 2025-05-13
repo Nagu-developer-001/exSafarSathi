@@ -78,7 +78,7 @@
     <!-- <form action="listing/new" method="get">
         <button>new</button>
     </form> -->
-    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 card-lists">
         <%for(list of allListing){%>
             <a href="http://localhost:8080/listings/<%= list._id %>" class="listing-anch">
                 <div class="card col card-list">
@@ -97,6 +97,7 @@
     </div>
 </body>
 <script>
+    //let cards = document.querySelectorAll(".card");
     let priceTag = document.querySelectorAll(".card-text .price-tags");
     let priceSpan = document.querySelectorAll(".card-text .price-tag");
     let tax = document.querySelectorAll(".taxation");
@@ -134,4 +135,17 @@
             }
         }
     });
+    
+// function addBack(){
+//     for(card of cards){
+//         card.classList.add("card-dark");
+//     }
+// }
+// function removeBack(){
+//     for(card of cards){
+//         card.classList.remove("card-dark");
+//     }
+// }
+// addBack();
+// removeBack();
 </script>

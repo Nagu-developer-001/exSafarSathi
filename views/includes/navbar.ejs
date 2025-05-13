@@ -22,17 +22,17 @@
     display: none;
 }
 </style>
-<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+<nav class=" navbar-expand-md bg-body-light border-bottom sticky-top">
     <div class="container-fluid">
     <a class="navbar-brand" href="/listings"><i class="fa-solid fa-location-arrow solids"></i></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <!-- <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <label class="mode">
             <input type="checkbox" id="darkModeToggle">
             <i class="fa-solid fa-moon"></i>
-        </label>
+        </label> -->
         <div class="navbar-nav">
         <!-- <a class="nav-link " href="/">Home</a> -->
         <a class="nav-link" href="/listings">Explore</a>
@@ -67,7 +67,7 @@ const header = document.getElementsByClassName('navbar')[0];
 const body = document.querySelector(".dark");
 const cards = document.querySelectorAll(".card");
 const solid = document.querySelector(".solids");
-//console.log(header,body,cards);
+console.log(header,body,cards);
 const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
 if (isDarkMode){
     solid.classList.add('dark-solid');
@@ -77,22 +77,27 @@ if (isDarkMode){
     darkModeToggle.checked = true;
 }
 darkModeToggle.addEventListener('change', () => {
-    if (darkModeToggle.checked){
+    const cardBodies = document.querySelectorAll('.card-body'); // Select all card bodies
+    if (darkModeToggle.checked) {
         solid.classList.add('dark-solid');
         header.classList.add('dark-mode');
         body.classList.add('dark-mode');
         addBack();
+        cardBodies.forEach(cardBody => {
+            cardBody.style.backgroundColor = '#C4D9FF'; // Change card body color
+        });
         localStorage.setItem('darkMode', 'enabled');
-    }
-    else{
-        setTimeout(()=>{
+    } else {
+        setTimeout(() => {
             solid.classList.remove('dark-solid');
             header.classList.remove('dark-mode');
-        body.classList.remove('dark-mode');
-        removeBack();
-        localStorage.setItem('darkMode', 'disabled')
-        },500);
-        
+            body.classList.remove('dark-mode');
+            removeBack();
+            cardBodies.forEach(cardBody => {
+                cardBody.style.backgroundColor = ''; // Reset card body color
+            });
+            localStorage.setItem('darkMode', 'disabled');
+        }, 500);
     }
 });
 
@@ -106,4 +111,21 @@ function removeBack(){
         card.classList.remove("card-dark");
     }
 }
+//  let toggleTheme = document.querySelector("#themeToggle"); // Example toggle button
+//    toggleTheme.addEventListener("change", () => {
+//        let cards = document.querySelectorAll(".card");
+//        if (toggleTheme.checked) {
+//            document.body.classList.add("dark-mode");
+//            cards.forEach(card => {
+//                card.classList.remove("card-light");
+//                card.classList.add("card-dark");
+//            });
+//        } else {
+//            document.body.classList.remove("dark-mode");
+//            cards.forEach(card => {
+//                card.classList.remove("card-dark");
+//                card.classList.add("card-light");
+//            });
+//        }
+//    });
 </script>
