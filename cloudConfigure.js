@@ -7,7 +7,7 @@ cloudinary.config({
   api_secret:process.env.CLOUD_API_SECRET
 });
 
-const  = new CloudinaryStorage({
+const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'SafarSathi_DEVOLOPMENT_Phase',
