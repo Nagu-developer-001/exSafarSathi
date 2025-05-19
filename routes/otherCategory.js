@@ -63,14 +63,14 @@ router.get("/booking/:id", isLogined, async (req, res, next) => {
     // **Manually Add Table Data**
     let startY = 40;
     doc.setFont("helvetica", "bold");
-    doc.text("Place name        Price    ", 14, startY);
+    //doc.text("Place name        Price    ", 14, startY);
 
     doc.setFont("helvetica", "normal");
     //let index = 0;
     //for (const b of places) {
     startY += 10; // Increment Y position for each row
     doc.text(
-        `${places.title}    ₹${places.price}`,
+        `Place name - ${places.title} with price : ${places.price}`,
         14,
         startY
     );
@@ -101,6 +101,10 @@ router.delete("/del/:id", isLogined, async (req, res, next) => {
 // FAQ Page Route
 router.get("/FAQ", UniqueUrl, (req, res) => {
     return res.render("./listings/faq.ejs");
+});
+
+router.get("/privacy", UniqueUrl, (req, res) => {
+    return res.render("./listings/privacyTerm.ejs");
 });
 
 // Help Page Route

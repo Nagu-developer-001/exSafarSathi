@@ -33,7 +33,7 @@ router.get("/userlist/:id", async(req, res) => {
 // User Details Route
 router.get("/userDetails/:id", wrapAsync(async (req, res) => {
     if (!req.isAuthenticated()) {
-        req.flash("error", "You must be logged in.");
+        req.flash("success", "We are Updating your Confidential Data ! , Please Re-login....");
         return res.redirect("/listings");
     }
 
@@ -41,7 +41,7 @@ router.get("/userDetails/:id", wrapAsync(async (req, res) => {
     const user = await User.findById(id);
     const userBooking = await Booking.find({ owner: id }).populate({ path: "places_list", populate: { path: "owner" } });
 
-    console.log(user);
+    //console.log(user);
     return res.render("./signup/userDetails.ejs", { user, userBooking });
 }));
 // Update User
@@ -59,11 +59,11 @@ router.post("/updateUser/:id/edit", upload.single("userData[image]"), validateUp
         let { path: url, filename } = req.file;
         data.image = { url, filename };
         await data.save();
-        console.log("Updated user data:", data);
+        //console.log("Updated user data:", data);
     }
 
     req.flash("success", "Your personal details were updated successfully!");
-    return res.redirect(`/userDetails/${id}`);
+    res.redirect(`/userDetails/${id}`);
 }));
 
 // Signup Route

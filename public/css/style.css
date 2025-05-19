@@ -129,6 +129,7 @@ body{
 .dark-mode{
     background-color:#C4D9FF;
     box-shadow: 15px 5px 8px rgba(100, 97, 99, 0.916);
+    
     /* background-color: #fe424d; */
     /* transition:0.5s; */
 }

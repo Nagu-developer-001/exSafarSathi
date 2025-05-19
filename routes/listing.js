@@ -35,7 +35,7 @@ router.get("/api/TestListings", async (req, res, next) => {
 router.get("/", async (req, res, next) => {
     try {
         let allListing = await placeList.find({});
-        console.log("Fetched Listings:", allListing);
+        //console.log("Fetched Listings:", allListing);
         return res.render("listings/index.ejs", { allListing });
     } catch (error) {
         next(error);
