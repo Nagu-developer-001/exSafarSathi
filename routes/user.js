@@ -174,7 +174,7 @@ router.post("/forgotPasswordOtp", wrapAsync(async (req, res) => {
 
     if (password !== Cpassword) {
         req.flash("error", "Passwords do not match!");
-        return res.redirect("/forgotPassword");
+        return res.redirect("/");
     }
 
     return res.redirect("/validatePasswordOtp");
