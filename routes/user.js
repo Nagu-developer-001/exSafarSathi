@@ -41,7 +41,7 @@ router.get("/userDetails/:id", wrapAsync(async (req, res) => {
     const user = await User.findById(id);
     const userBooking = await Booking.find({ owner: id }).populate({ path: "places_list", populate: { path: "owner" } });
 
-    //console.log(user);
+    console.log(user,userBooking);
     return res.render("./signup/userDetails.ejs", { user, userBooking });
 }));
 // Update User
